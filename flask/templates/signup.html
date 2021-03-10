@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="text-center">
+    <h3 class="title">Sign Up</h3>
+         <main style="width: 100%; max-width: 330px; padding: 15px; margin: auto;">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="notification is-danger">
+                    {{ messages[0] }}. Go to <a href="/micro/login/">Login page</a>.
+                </div>
+            {% endif %}
+        {% endwith %}
+        <form method="POST" action="/micro/signup/">
+            <div class="field">
+                <div class="control">
+                    <input class="form-control" type="email" name="email" placeholder="Email" autofocus="">
+                </div>
+            </div>
+
+            <div class="field">
+                <div class="control">
+                    <input class="form-control" type="text" name="name" placeholder="Name" autofocus="">
+                </div>
+            </div>
+
+            <div class="field">
+                <div class="control">
+                    <input class="form-control" type="password" name="password" placeholder="Password">
+                </div>
+            </div>
+
+            <button class="w-100 btn btn-lg btn-primary">Sign Up</button>
+        </form>
+         </main>
+    </div>
+{% endblock %}

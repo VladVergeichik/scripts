@@ -1,0 +1,14 @@
+xlwt
+xlrd
+shopify-api
+flask
+werkzeug
+flask_sqlalchemy
+flask_login
+ebaysdk
+python-walmart
+uuid
+xlsxwriter
+bokeh
+geopandas
+psycopg2

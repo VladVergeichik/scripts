@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="text-center">
+    <h3 class="title">Login</h3>
+        <main style="width: 100%; max-width: 330px; padding: 15px; margin: auto;">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="notification is-danger">
+                    {{ messages[0] }}
+                </div>
+            {% endif %}
+        {% endwith %}
+        <form method="POST" action="/micro/login/">
+                    <input class="form-control" type="email" name="email" placeholder="Your Email" autofocus="">
+
+                    <input class="form-control" type="password" name="password" placeholder="Your Password">
+            <div class="field">
+                <label class="checkbox">
+                    <input type="checkbox">
+                    Remember me
+                </label>
+            </div>
+            <button class="w-100 btn btn-lg btn-primary">Login</button>
+        </form>
+        </main>
+    </div>
+</div>
+{% endblock %}

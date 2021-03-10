@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>{% block title %}  {% endblock %}</h1>
+    <div class="bd-example bd-example-tabs">
+        <div class="row" style="height: 100%; width: 100%">
+            <div class="col-3">
+                <div class="tab-content" id="nav-tabContent">
+                    <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                        <a class="nav-link active" id="v-pills-home-tab"
+                    data-toggle="pill"
+                    href="#v-pills-home" role="tab" aria-controls="v-pills-home" aria-selected="true">Info marketplace</a>
+                        <a class="nav-link" id="v-pills-profile-tab" data-toggle="pill"
+                    href="#v-pills-profile" role="tab" aria-controls="v-pills-profile" aria-selected="false">Uploads</a>
+                        <a class="nav-link" id="v-pills-messages-tab" data-toggle="pill" href="#v-pills-config"
+                    role="tab" aria-controls="v-pills-messages" aria-selected="false">Config</a>
+                        <a class="nav-link" id="v-pills-messages-tab" data-toggle="pill" href="#v-pills-messages"
+                    role="tab" aria-controls="v-pills-messages" aria-selected="false">Other</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-9">
+                <div class="tab-content" id="v-pills-tabContent">
+                <div class="tab-pane fade show active " id="v-pills-home" role="tabpanel" aria-labelledby="v-pills-home-tab">
+                    <a class="text-decoration-none" href="/micro/get_amazon_us_info/">Amazon US info</a><br>
+{#                    <a class="text-decoration-none" href="/micro/get_amazon_ca_info/">Amazon CA info</a><br>#}
+                    <a class="text-decoration-none" href="/micro/get_ebay_info/">Ebay info</a><br>
+{#                    <a class="text-decoration-none" href="/micro/get_shopify_info/">Shopify info</a><br>#}
+{#                    <a class="text-decoration-none" href="/micro/get_walmart_info/">Walmart info</a><br>#}
+{#                    <a class="text-decoration-none" href="/micro/get_purchase_info/">Purchase info</a><br>#}
+                </div>
+                <div class="tab-pane fade" id="v-pills-profile" role="tabpanel" aria-labelledby="v-pills-profile-tab">
+                    <div class="card mb-4 shadow-sm">
+                        <div class="card-header">
+                            <h4 class="my-0 fw-normal">Marketplace</h4>
+                        </div>
+                        <div class="card-body">
+{#                            <div>#}
+{#                                Shopify price#}
+{#                                <form action="/micro/upload_shopify_price/" method=post enctype=multipart/form-data>#}
+{#                                    <input type=file name=file>#}
+{#                                    <input type=submit value="Upload shopify price">#}
+{#                                </form>#}
+{#                            </div><br>#}
+                            <div>
+                                Ebay price
+                                <form action="/micro/upload_ebay_price/" method=post enctype=multipart/form-data>
+                                    <input type=file name=file>
+                                    <input type=submit value="Upload Ebay price">
+                                </form>
+                            </div><br>
+{#                            <div>#}
+{#                                Walmart price#}
+{#                                <form action="/micro/upload_walmart_price/" method=post enctype=multipart/form-data>#}
+{#                                    <input type=file name=file>#}
+{#                                    <input type=submit value="Upload Walmart price">#}
+{#                                </form>#}
+{#                            </div><br>#}
+                          <a href="/micro/get_shopify_price_template/">Get marketplace template price</a><br>
+                        </div>
+                    </div>
+                    <div class="card mb-4 shadow-sm">
+                        <div class="card-header">
+                            <h4 class="my-0 fw-normal">Odoo</h4>
+                        </div>
+                        <div class="card-body">
+                            <div>
+                        Vendor price
+                        <form action="/micro/upload_vendor_price/" method=post enctype=multipart/form-data>
+                            <input type=file name=file>
+                            <input type=submit value="Upload vendor price">
+                        </form>
+                        <form action="/micro/add_product/" method=post enctype=multipart/form-data>
+                            <input type=file name=file>
+                            <input type=submit value="Add product">
+                        </form>
+                        <form action="/micro/update_package_qty/" method=post enctype=multipart/form-data>
+                            <input type=file name=file>
+                            <input type=submit value="Update package quantity">
+                        </form>
+                        <a href="/micro/get_vendor_price_template/">Get template vendor price</a>
+                    </div><br>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="tab-pane fade" id="v-pills-config" role="tabpanel" aria-labelledby="v-pills-messages-tab">
+                    <form action="/micro/update_config/" method=post enctype=multipart/form-data>
+                        <input name="number" value="{{ value.hello }}">
+                    </form>
+                </div>
+                <div class="tab-pane fade" id="v-pills-messages" role="tabpanel" aria-labelledby="v-pills-messages-tab">
+                    <a class="text-decoration-none" href="/micro/data_states/">Data states</a><br>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script>$('#v-pills-tab a').on('click', function (e) {
+  e.preventDefault()
+  $(this).tab('show')
+})</script>
+{% endblock %}
