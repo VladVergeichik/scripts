@@ -1,11 +1,11 @@
 import xmlrpc.client
-from datetime import datetime, timedelta
 import shipstation_lib as shl
 import core
 import json
 import requests
 import math
 import psycopg2
+from datetime import datetime, timedelta
 
 
 class ShipstationBase:
@@ -209,8 +209,8 @@ class ShipstationBase:
             }
             json_data = json.dumps(default_data, indent=4)
             response = requests.post(url, headers=headers, data=json_data,
-                                     auth=('aa2795f14dbf4cf8967a0437ee335dd9',
-                                           'df20a32ae5d44dc08e2ce7ac55811859'))
+                                     auth=('x',
+                                           'x'))
             return_data.append(response.json())
         return return_data
 

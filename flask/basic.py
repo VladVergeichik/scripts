@@ -1,42 +1,29 @@
 # coding: utf-8
-from flask import Flask, render_template, send_from_directory, request, send_file, flash, request, redirect, url_for, Blueprint, jsonify
-from flask import current_app
-from __init__ import db, render_template, send_file
-import shopify
-import sys
 import xmlrpc.client
 import csv
 import os
 import psycopg2
-import logging
 import requests
-from requests.auth import HTTPBasicAuth
-from flask_login import login_user, login_required
-from werkzeug.utils import secure_filename
-from ebaysdk.trading import Connection as Trading
-
-
-# sys.path.append('/micro/libs')
-# import Shopify
 import walmart
 import uuid
 import xlrd
 import xlsxwriter
 import json
-from bokeh.plotting import figure
-from bokeh.resources import CDN
-from bokeh.io import show
+import pandas as pd
+import geopandas as gpd
+from requests.auth import HTTPBasicAuth
+from flask_login import login_user, login_required
+from werkzeug.utils import secure_filename
+from ebaysdk.trading import Connection as Trading
+from flask import Flask, render_template, send_from_directory, request, send_file, flash, request, redirect, url_for, Blueprint, jsonify
+from flask import current_app
+from __init__ import render_template, send_file
 from bokeh.models import (CDSView, ColorBar, ColumnDataSource,
 						  CustomJS, CustomJSFilter,
 						  GeoJSONDataSource, HoverTool,
 						  LinearColorMapper, Slider)
-from bokeh.layouts import column, row, widgetbox
 from bokeh.palettes import brewer
-from bokeh.embed import file_html
-from bokeh.plotting import figure  # Input GeoJSON source that contains features for plotting
-import pandas as pd
 from bokeh.plotting import figure, output_file, save
-# import geopandas as gpd  # Read in shapefile and examine data
 
 ALLOWED_EXTENSIONS = {'xls', 'xlsx', 'csv'}
 
@@ -77,23 +64,15 @@ WHERE rcs.name NOT IN ('CALIFORNIA', 'IOWA') AND sol.is_delivery is FALSE	 GROUP
 
 	contiguous_usa = gpd.read_file('/micro/data_map/cb_2018_us_state_20m.shp')
 	contiguous_usa.head()
-	# Merge shapefile with population data
-	# pop_states = contiguous_usa.merge(state_pop, left_on = 'NAME', right_on = 'NAME')# Drop Alaska and Hawaii
-	# pop_states = pop_states.loc[~pop_states['NAME'].isin(['Alaska', 'Hawaii'])]
 	state_pop.head()
-	pop_states = contiguous_usa.merge(state_pop, left_on='NAME', right_on='NAME')  # Drop Alaska and Hawaii
-	# pop_states = pop_states.loc[~pop_states['NAME'].isin(['Alaska'])]
+	pop_states = contiguous_usa.merge(state_pop, left_on='NAME', right_on='NAME')
 	m = pop_states.NAME == "Alaska"
 	pop_states[m] = pop_states[m].set_geometry(pop_states[m].scale(.2, .2, .2).translate(-80, -40))
-	# print(max(state_pop['Sales']))
 	geosource = GeoJSONDataSource(geojson=pop_states.to_json())
-
-	# Define color palettes
 	palette = brewer['BuGn'][8]
-	palette = palette[
-			  ::-1]  # reverse order of colors so higher values have darker colors# Instantiate LinearColorMapper that linearly maps numbers in a range, into a sequence of colors.
+	palette = palette[::-1]
 	color_mapper = LinearColorMapper(palette=palette, low=0,
-									 high=max(state_pop['Sales']))  # Define custom tick labels for color bar.
+									 high=max(state_pop['Sales']))
 	tick_labels = {'0': '0', '5000': '5,000',
 				   '10000': '10,000', '15000': '15,000',
 				   '20000': '20,000', '25000': '25,000',
@@ -120,22 +99,22 @@ WHERE rcs.name NOT IN ('CALIFORNIA', 'IOWA') AND sol.is_delivery is FALSE	 GROUP
 						 border_line_color=None,
 						 location=(0, 0),
 						 orientation='horizontal',
-						 major_label_overrides=tick_labels)  # Create figure object.
+						 major_label_overrides=tick_labels)
 	p = figure(title='Sales per states',
 			   plot_height=600, plot_width=1350,
 			   toolbar_location='below',
 			   tools="pan, wheel_zoom, box_zoom, reset")
 	p.xgrid.grid_line_color = None
-	p.ygrid.grid_line_color = None  # Add patch renderer to figure.
+	p.ygrid.grid_line_color = None
 	states = p.patches('xs', 'ys', source=geosource,
 					   fill_color={'field': 'Sales',
 								   'transform': color_mapper},
 					   line_color='gray',
 					   line_width=0.25,
-					   fill_alpha=1.2)  # Create hover tool
+					   fill_alpha=1.2)
 	p.add_tools(HoverTool(renderers=[states],
 						  tooltips=[('State', '@NAME'),
-									('Sales', '@Sales')]))  # Specify layout
+									('Sales', '@Sales')]))
 	output_file("/micro/templates/pilot.html")
 	save(p)
 	return render_template('map_states.html')
@@ -286,7 +265,7 @@ def upload_vendor_price():
 				if dict_update_product != {}:
 					model.execute_kw(info["database"], uid, info["password"], 'product.template',
 									 'write', [[data_db[0][0]], dict_update_product])
-			conn.close
+			conn.close()
 			return redirect('/micro/')
 		return redirect('/micro/')
 
@@ -536,8 +515,10 @@ FROM sale_order_line WHERE product_id in ("""+','.join([str(i['product_product_i
 		query = """SELECT sl.name, sq.quantity - sq.reserved_quantity
 					FROM stock_quant sq
 						INNER JOIN stock_location sl on sq.location_id = sl.id
-					WHERE sq.product_id = (SELECT id FROM product_product WHERE product_tmpl_id = """+str(product['id'])+""" LIMIT 1)
-					  AND sq.location_id not in (1, 2, 3, 4, 5, 6, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 828, 4312, 4342)
+					WHERE sq.product_id = (SELECT id FROM product_product WHERE product_tmpl_id = 
+					"""+str(product['id'])+""" LIMIT 1)
+					  AND sq.location_id not in 
+					  (1, 2, 3, 4, 5, 6, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 828, 4312, 4342)
 					AND sq.company_id = 1"""
 		cur.execute(query)
 		locations = cur.fetchall()
