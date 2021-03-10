@@ -81,13 +81,9 @@ class ComputeMarginality(ShipstationBase):
 				WHERE so.x_marginality is NULL 
 				AND so.state = 'done'
 				GROUP BY so.id"""
-        # so.id not in (SELECT order_id FROM sale_order_line WHERE route_id = 6 or price_unit = 1)
         cur.execute(query)
         sales = cur.fetchall()
-        all = 0
-        minus = 0
         for sale in sales:
-            print(sale)
             delivery_price = 0
             sale_order_price = 0
             for data in sale[4]:
@@ -104,15 +100,11 @@ class ComputeMarginality(ShipstationBase):
                 if sale[3] is not None:
                     marginality += float(sale[3])
             else:
-                if sale[1] == 'Amazon US FBA' or sale[1] == 'Amazon CA FBA' or sale[
-                    1] == 'Amazon FBA CA' or 'Amazon FBA US':
+                if sale[1] == 'Amazon US FBA' or sale[1] == 'Amazon CA FBA' or sale[1] == 'Amazon FBA CA' \
+                        or 'Amazon FBA US':
                     print(sale[4][0]['f5'])
                     if sale[4][0]['f4'] != 0:
-                        sku_class = SKU()
-                        qty = int(sale[4][0]['f6']) \
-                            # * int(sku_class.validate_sku(sale[4][0]['f5'])[sale[4][0]['f5']]['case_quantity'])
-                        # print(int(sale[4][0]['f6']))
-                        # if sale[3] is not null:
+                        qty = int(sale[4][0]['f6'])
                         print(qty, sale_order_price, sale[4][0]['f4'])
                         marginality = round(sale_order_price, 2) - float(sale[4][0]['f4']) * qty
                         if sale[3] is not None:
@@ -124,27 +116,15 @@ class ComputeMarginality(ShipstationBase):
                             marginality += float(sale[3])
                         marginality = str(round(marginality, 2)) + ' not found FBA Fee'
                 else:
-                    # marginality = str(round(sale_order_price, 2) + float(sale[3]))+' without delivery'
                     marginality = sale_order_price
                     if sale[3] is not None:
                         marginality += float(sale[3])
                     marginality = str(round(marginality, 2)) + ' without delivery'
             print(sale[1], sale[2], marginality)
-            # print(sale[0])
-
             self.model.execute_kw(self.info["database"], self.uid, self.info["password"], 'sale.order', 'write',
                                   [[sale[0]], {
                                       'x_marginality': marginality
                                   }])
-        # with open('marginality.csv', 'a') as f:
-        # 	writer = csv.writer(f)
-        # 	print(sale)
-        # 	writer.writerow((sale[2], sale[1], marginality, sale))
-        # if isinstance(marginality, float) or isinstance(marginality, int):
-        # 	all += marginality
-        # 	if marginality < 0:
-        # 		minus += 1
-        print(all, minus)
 
     def get_product_info(self):
         cur = self.conn.cursor()
@@ -286,26 +266,13 @@ class ComputeMarginality(ShipstationBase):
         cur = self.conn.cursor()
         cur.execute(query_orders)
         orders = cur.fetchall()
-        # url = "http://data.fixer.io/api/latest?access_key=94775f013cd654d9a12cdccf2f4cb33e&symbols=USD,CAD"
-        # payload = {}
-        # response = requests.request("GET", url)
-        # rates = response.json()['rates']['USD'] / response.json()['rates']['CAD']
-        # rates_another = response.json()['rates']['CAD'] / response.json()['rates']['USD']
-
         for order in orders:
             try:
                 print(order[0])
                 delivery_price = 0
                 sale_order_price = 0
                 unit_price_order = 0
-                # if  order[1] == 'Amazon CA FBA' \
-                # 		or order[1] == 'Amazon FBA CA' \
-                # 		or order[1] == 'Amazon US FBA' \
-                # 		or order[1] == 'Amazon FBA US':
-                # if 0 in [product['f10'] for product in order[4]]:
-                # 	continue
                 for product in order[4]:
-                    product_stock_unit_cost = 0
                     qty = self.model.execute_kw(self.info['database'], self.uid, self.info['password'],
                                                 'product.template', 'search_read', [[['id', '=', product['f3']]]],
                                                 {"fields": ["free_to_use"]})
@@ -360,11 +327,11 @@ class ComputeMarginality(ShipstationBase):
                         product_stock_unit_cost = current_unit_cost
                     if product['f4'] is False:
                         unit_price_order += float(product['f11'])
-                    query = 'UPDATE sale_order_line SET x_unit_cost_stock = ' \
-                            + str(product_stock_unit_cost) + ', x_fee = ' + str(
-                        1 - product['f9']) + ', x_fba_fee = ' + str(product['f10']) + ' WHERE order_id = ' \
-                            + str(
-                        order[0]) + ' AND product_id = (SELECT id FROM product_product WHERE product_tmpl_id = ' \
+                    query = 'UPDATE sale_order_line SET x_unit_cost_stock = '+ str(product_stock_unit_cost) + ', ' \
+                            'x_fee = ' + str(1 - product['f9']) + ', ' \
+                            'x_fba_fee = ' + str(product['f10']) + ' ' \
+                            'WHERE order_id = ' + str(order[0]) + \
+                            ' AND product_id = (SELECT id FROM product_product WHERE product_tmpl_id = ' \
                             + str(product['f3']) + ' LIMIT 1)'
                     cur.execute(query)
                     self.conn.commit()
